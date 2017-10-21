@@ -18,7 +18,7 @@ func (_ *_Alert) Index(ctx *gogo.Context) {
 
 	alerts, err := models.Alert.All(limit, marker)
 	if err != nil {
-		ctx.Logger.Errorf("models.Device.All(%v, %v): %v", limit, marker, err)
+		ctx.Logger.Errorf("models.Alert.All(%v, %v): %v", limit, marker, err)
 
 		ctx.Json(errors.NewErrorResponse(ctx.RequestID(), ctx.RequestURI(), errors.InternalError))
 		return
