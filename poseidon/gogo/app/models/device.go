@@ -70,6 +70,23 @@ func (_ *_Device) All(limit int, marker string) (result []*DeviceModel, err erro
 	return
 }
 
+func (_ *_Device) Find(id string) (device *DeviceModel, err error) {
+	if !bson.IsObjectIdHex(id) {
+		err = ErrInvalidID
+		return
+	}
+
+	Device.Query(func(c *mgo.Collection) {
+		query := bson.M{
+			"_id": bson.ObjectIdHex(id),
+		}
+
+		err = c.Find(query).One(&device)
+	})
+
+	return
+}
+
 // todo add num field
 func NewDeviceModel(pass, addr string) *DeviceModel {
 	return &DeviceModel{
