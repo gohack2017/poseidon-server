@@ -16,6 +16,25 @@ var (
 	User *_User
 )
 
+func (_ *_User) Create(ctx *gogo.Context) {
+	var input *CreateUserInput
+	if err := ctx.Params.Json(&input); err != nil {
+		ctx.Logger.Errorf("ctx.Parmas.Json(): %v", err)
+
+		ctx.Json(errors.NewErrorResponse(ctx.RequestID(), ctx.RequestURI(), errors.MalformedParameter))
+		return
+	}
+
+	user := models.NewUserModel(input.Email, input.Password)
+	if err := user.Save(); err != nil {
+		ctx.Logger.Errorf("user.Save(): %v", err)
+
+		ctx.Json(errors.NewErrorResponse(ctx.RequestID(), ctx.RequestURI(), errors.InternalError))
+		return
+	}
+	ctx.Return()
+}
+
 func (_ *_User) Login(ctx *gogo.Context) {
 	sess := APP.Session()
 
