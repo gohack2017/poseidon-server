@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/dolab/gogo"
-	"github.com/hackthon/lib/model"
+	"github.com/poseidon/lib/model"
 )
 
 var (
