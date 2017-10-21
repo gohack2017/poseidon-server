@@ -43,6 +43,39 @@
         "secret_key": "sk",
         "group_id": "gohack2017",
         "timeout": 10
+      },
+      "qiniu": {
+        "kodo": {
+          "access_key": "iWOdGMCLlN8NXSIak9PGRkU6wiBl0VfzC_IqbCcw",
+          "secret_key": "6y6piBiomKQCUScEDC15dPHIkPAx-nJwSKP5Fr8b",
+          "bucket": "hackthon",
+          "kodo": {
+            "zone": {
+              "SrcUpHosts": [
+                "up.qiniup.com",
+                "up-nb.qiniup.com",
+                "up-xs.qiniup.com"
+              ],
+              "CdnUpHosts": [
+                "upload.qiniup.com",
+                "upload-nb.qiniup.com",
+                "upload-xs.qiniup.com"
+              ],
+              "RsHost": "rs.qiniu.com",
+              "RsfHost": "rsf.qiniu.com",
+              "ApiHost": "api.qiniu.com",
+              "IovipHost": "iovip.qbox.me"
+            },
+            "UseHTTPS": true,
+            "UseCdnDomains": false
+          }
+        },
+        "atlab": {
+          "endpoint": "http://serve.atlab.ai",
+          "access_key": "yvkBAhylLK6HTrhU644UcFiVeFhRMR4geKGB1Prt",
+          "secret_key": "1Kfm9tUJURJWxYFHWL1X-HuVVFMMEPwn2S4j5EoW",
+          "timeout": 30
+        }
       }
     },
     "test": {

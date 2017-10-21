@@ -1,34 +1,34 @@
 package controllers
 
 import (
-    "net/http/httptest"
-    "os"
-    "path"
-    "testing"
+	"net/http/httptest"
+	"os"
+	"path"
+	"testing"
 
-    "github.com/dolab/httptesting"
+	"github.com/dolab/httptesting"
 )
 
 var (
-    testServer *httptest.Server
-    testClient *httptesting.Client
+	testServer *httptest.Server
+	testClient *httptesting.Client
 )
 
 func TestMain(m *testing.M) {
-    var (
-        runMode = "test"
-        srcPath = path.Clean("../../")
-    )
+	var (
+		runMode = "test"
+		srcPath = path.Clean("../../")
+	)
 
-    app := New(runMode, srcPath)
-    app.Resources()
+	app := New(runMode, srcPath)
+	app.Resources()
 
-    testServer = httptest.NewServer(app)
-    testClient = httptesting.New(testServer.URL, false)
+	testServer = httptest.NewServer(app)
+	testClient = httptesting.New(testServer.URL, false)
 
-    code := m.Run()
+	code := m.Run()
 
-    testServer.Close()
+	testServer.Close()
 
-    os.Exit(code)
+	os.Exit(code)
 }
