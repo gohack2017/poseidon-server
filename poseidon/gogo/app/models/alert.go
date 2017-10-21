@@ -22,17 +22,18 @@ var (
 )
 
 type AlertModel struct {
-	ID       bson.ObjectId `bson:"_id"`
-	BukongID bson.ObjectId `bson:"bukong_id"`
-	DeviceId bson.ObjectId `bson:"device_id"`
+	ID       bson.ObjectId `bson:"_id" json:"-"`
+	BukongID bson.ObjectId `bson:"bukong_id" json:"-"`
+	DeviceId bson.ObjectId `bson:"device_id" json:"-"`
 
-	Address       string `bson:"address"`
-	ScenePhotoUri string `bson:"scene_photo"`
-	PhotoUri      string `bson:"photo"`
-	MonitorClass  string `bson:"class"`
+	Address       string  `bson:"address" json:"address"`
+	ScenePhotoUri string  `bson:"scene_photo" json:"scene_photo"`
+	PhotoUri      string  `bson:"photo" json:"photo"`
+	MonitorClass  string  `bson:"class" json:"class"`
+	Score         float64 `bson:"score" json:"score"`
 
-	CreatedAt time.Time `bson:"created_at"`
-	UpdatedAt time.Time `bson:"updated_at"`
+	CreatedAt time.Time `bson:"created_at" json:"created_at"`
+	UpdatedAt time.Time `bson:"updated_at" json:"-"`
 
 	isNewRecord bool `bson:"-"`
 }

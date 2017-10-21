@@ -3,7 +3,6 @@ package sms
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -52,8 +51,6 @@ func (sms *SMS) Send(phone, content string) (out *SMSOutput, err error) {
 	payload.Add("mobile", phone)
 	payload.Add("content", content)
 	payload.Add("format", "json")
-
-	fmt.Println(payload.Encode())
 
 	request, err := http.NewRequest("POST", sms.ResourceAPI(params), strings.NewReader(payload.Encode()))
 	if err != nil {

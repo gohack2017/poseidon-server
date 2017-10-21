@@ -171,6 +171,7 @@ func checkFace(logger gogo.Logger, uri string, device *models.DeviceModel) {
 		alert, err := models.Alert.FindByBukongAndDevice(bukong.ID.Hex(), device.ID.Hex())
 		if err == mgo.ErrNotFound {
 			alert = models.NewAlertModel(device.Address, uri, bukong.URI, bukong.MonitorClass, bukong.ID.Hex(), device.ID.Hex())
+			alert.Score = result.Score()
 			if err = alert.Save(); err != nil {
 				logger.Errorf("alert.Save():%v", err)
 				return
