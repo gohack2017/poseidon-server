@@ -18,7 +18,7 @@ type _User struct{}
 var (
 	User *_User
 
-	userCollection = "monitor_user"
+	userCollection = "poseidon_user"
 	userIndexes    = []mgo.Index{
 		{
 			Key:    []string{"email"},
@@ -60,6 +60,10 @@ func (user *UserModel) Save() (err error) {
 			user.Password = User.MakeEncryptPassword(user.Salt, user.Password)
 			user.CreatedAt = t
 			user.UpdatedAt = t
+
+			if err = c.Insert(user); err == nil {
+				user.isNewRecord = false
+			}
 		} else {
 			settings := bson.M{
 				"email":      user.Email,
