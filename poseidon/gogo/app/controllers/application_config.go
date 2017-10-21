@@ -5,6 +5,7 @@ import (
 	"github.com/dolab/session"
 	"github.com/poseidon/app/concerns/facex"
 	"github.com/poseidon/app/concerns/kodo"
+	"github.com/poseidon/app/concerns/sms"
 	"github.com/poseidon/lib/model"
 )
 
@@ -18,6 +19,7 @@ type AppConfig struct {
 	Logger *gogo.LoggerConfig `json:"logger"`
 	Cookie *session.Config    `json:"cookie"`
 	Facex  *facex.Config      `json:"facex"`
+	SmsCfg *sms.Config        `json:"sms"`
 }
 
 // NewAppConfig apply application config from *gogo.AppConfig

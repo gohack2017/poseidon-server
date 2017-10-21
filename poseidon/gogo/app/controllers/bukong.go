@@ -129,7 +129,15 @@ func checkFace(logger gogo.Logger, uri, address string) {
 		}
 
 		//step 2: send alert message
+		out, err := SMSClient.Send(bukong.Phone, Config.SmsCfg.renRender("110110"))
+		if err != nil {
+			logger.Errorf("SMSClient.Send(): %v", err)
+			return
+		}
 
+		if !out.IsOK() {
+			logger.Warnf("SMSClient.Send failed(): %s", out.Message)
+		}
 	}
 }
 
