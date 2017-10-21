@@ -69,13 +69,13 @@
             "UseHTTPS": true,
             "UseCdnDomains": false
           }
-        },
-        "atlab": {
-          "endpoint": "http://serve.atlab.ai",
-          "access_key": "",
-          "secret_key": "",
-          "timeout": 30
         }
+      },
+      "sms": {
+        "endpoint": "http://106.ihuyi.com",
+        "account": "",
+        "secret": "",
+        "template": "您的验证码是：%s。请不要把验证码泄露给其他人。"
       }
     },
     "test": {
@@ -104,6 +104,12 @@
         "secret_key": "sk",
         "group_id": "gohack2017",
         "timeout": 10
+      },
+      "sms": {
+        "endpoint": "http://106.ihuyi.com",
+        "account": "",
+        "secret": "",
+        "template": "您的验证码是：%s。请不要把验证码泄露给其他人。"
       }
     },
 
@@ -129,6 +135,12 @@
         "secret_key": "sk",
         "group_id": "gohack2017",
         "timeout": 10
+      },
+      "sms": {
+        "endpoint": "http://106.ihuyi.com",
+        "account": "",
+        "secret": "",
+        "template": "您的验证码是：%s。请不要把验证码泄露给其他人。"
       }
     }
   }

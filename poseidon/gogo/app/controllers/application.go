@@ -6,6 +6,7 @@ import (
 	"github.com/dolab/gogo"
 	"github.com/dolab/session"
 	"github.com/poseidon/app/concerns/facex"
+	"github.com/poseidon/app/concerns/sms"
 	"github.com/poseidon/app/middlewares"
 	"github.com/poseidon/app/models"
 )
@@ -14,7 +15,8 @@ var (
 	APP    *Application
 	Config *AppConfig
 
-	FaceX *facex.Facex
+	FaceX     *facex.Facex
+	SMSClient *sms.SMS
 )
 
 type Application struct {
@@ -44,6 +46,8 @@ func New(runMode, srcPath string) *Application {
 	models.SetupModelWithConfig(Config.Mongo, appLogger)
 	// init facex
 	FaceX = facex.NewFacex(Config.Facex)
+	// init sms
+	SMSClient = sms.New(Config.SmsCfg)
 
 	APP = &Application{
 		AppServer: appServer,

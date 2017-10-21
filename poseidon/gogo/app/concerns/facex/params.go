@@ -72,6 +72,10 @@ func (this *SearchResult) Name() string {
 	return this.Result.Detections[0].Value.Name
 }
 
+func (this *SearchResult) Score() float64 {
+	return this.Result.Detections[0].Value.Score
+}
+
 func NewSearchInput(uri string) *SearchInput {
 	return &SearchInput{
 		Data: map[string]string{
