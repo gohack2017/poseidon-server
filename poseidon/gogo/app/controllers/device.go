@@ -45,3 +45,30 @@ func (_ *_Device) Index(ctx *gogo.Context) {
 	}
 	ctx.Json(devices)
 }
+
+func (_ *_Device) Exist(ctx *gogo.Context) {
+	var input *ShowDeviceInput
+	if err := ctx.Params.Json(&input); err != nil {
+		ctx.Logger.Errorf("ctx.Params.Json(): %v", err)
+
+		ctx.Json(errors.NewErrorResponse(ctx.RequestID(), ctx.RequestURI(), errors.MalformedParameter))
+		return
+	}
+
+	device, err := models.Device.FindByNum(input.Num)
+	if err != nil {
+		ctx.Logger.Errorf("models.Device.FindByNum(%v):%v", input.Num, err)
+
+		ctx.Json(errors.NewErrorResponse(ctx.RequestID(), ctx.RequestURI(), errors.InternalError))
+		return
+	}
+
+	if device.Password != input.Password {
+		ctx.Logger.Errorf("invalid parameters")
+
+		ctx.Json(errors.NewErrorResponse(ctx.RequestID(), ctx.RequestURI(), errors.InvalidParameter))
+		return
+	}
+
+	ctx.Json(device)
+}

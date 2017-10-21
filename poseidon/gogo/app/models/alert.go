@@ -13,15 +13,23 @@ var (
 	Alert *_Alert
 
 	alertCollection = "poseidon_alert"
-	alertIndexes    = []mgo.Index{}
+	alertIndexes    = []mgo.Index{
+		{
+			Key:    []string{"bukong_id", "device_id"},
+			Unique: false,
+		},
+	}
 )
 
 type AlertModel struct {
-	ID            bson.ObjectId `bson:"_id"`
-	Address       string        `bson:"address"`
-	ScenePhotoUri string        `bson:"scene_photo"`
-	PhotoUri      string        `bson:"photo"`
-	MonitorClass  string        `bson:"class"`
+	ID       bson.ObjectId `bson:"_id"`
+	BukongID bson.ObjectId `bson:"bukong_id"`
+	DeviceId bson.ObjectId `bson:"device_id"`
+
+	Address       string `bson:"address"`
+	ScenePhotoUri string `bson:"scene_photo"`
+	PhotoUri      string `bson:"photo"`
+	MonitorClass  string `bson:"class"`
 
 	CreatedAt time.Time `bson:"created_at"`
 	UpdatedAt time.Time `bson:"updated_at"`
@@ -29,15 +37,35 @@ type AlertModel struct {
 	isNewRecord bool `bson:"-"`
 }
 
-func NewAlertModel(addr, sphoto, photo, mclass string) *AlertModel {
+func NewAlertModel(addr, sphoto, photo, mclass, bukongId, deviceId string) *AlertModel {
 	return &AlertModel{
 		ID:            bson.NewObjectId(),
+		DeviceId:      bson.ObjectIdHex(deviceId),
+		BukongID:      bson.ObjectIdHex(bukongId),
 		Address:       addr,
 		ScenePhotoUri: sphoto,
 		PhotoUri:      photo,
 		MonitorClass:  mclass,
 		isNewRecord:   true,
 	}
+}
+
+func (_ *_Alert) FindByBukongAndDevice(bukongId, deviceId string) (res *AlertModel, err error) {
+	if !bson.IsObjectIdHex(bukongId) || !bson.IsObjectIdHex(deviceId) {
+		err = ErrInvalidID
+		return
+	}
+
+	Alert.Query(func(c *mgo.Collection) {
+		query := bson.M{
+			"bukong_id": bson.ObjectIdHex(bukongId),
+			"device_id": bson.ObjectIdHex(deviceId),
+		}
+
+		err = c.Find(query).One(&res)
+	})
+
+	return
 }
 
 func (alert *AlertModel) Save() (err error) {
