@@ -46,8 +46,8 @@
       },
       "qiniu": {
         "kodo": {
-          "access_key": "iWOdGMCLlN8NXSIak9PGRkU6wiBl0VfzC_IqbCcw",
-          "secret_key": "6y6piBiomKQCUScEDC15dPHIkPAx-nJwSKP5Fr8b",
+          "access_key": "",
+          "secret_key": "",
           "bucket": "hackthon",
           "kodo": {
             "zone": {
@@ -72,8 +72,8 @@
         },
         "atlab": {
           "endpoint": "http://serve.atlab.ai",
-          "access_key": "yvkBAhylLK6HTrhU644UcFiVeFhRMR4geKGB1Prt",
-          "secret_key": "1Kfm9tUJURJWxYFHWL1X-HuVVFMMEPwn2S4j5EoW",
+          "access_key": "",
+          "secret_key": "",
           "timeout": 30
         }
       }
