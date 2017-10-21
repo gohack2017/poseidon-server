@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"fmt"
 	"io/ioutil"
 	"strings"
+	"time"
 
 	"github.com/poseidon/app/concerns/facex"
 	"github.com/poseidon/app/concerns/kodo"
@@ -12,6 +12,7 @@ import (
 	"github.com/dolab/gogo"
 	"github.com/poseidon/app/models"
 	"github.com/poseidon/lib/errors"
+	mgo "gopkg.in/mgo.v2"
 )
 
 type _BuKong struct{}
@@ -145,12 +146,12 @@ func (_ *_BuKong) Check(ctx *gogo.Context) {
 	}
 
 	uri := "http://" + Config.Qiniu.Kodo.BucketDomain + "/" + key
-	go checkFace(ctx.Logger, uri, device.Address)
+	go checkFace(ctx.Logger, uri, device)
 
 	ctx.Return()
 }
 
-func checkFace(logger gogo.Logger, uri, address string) {
+func checkFace(logger gogo.Logger, uri string, device *models.DeviceModel) {
 	result, err := FaceX.Search(uri)
 	if err != nil {
 		logger.Errorf("Facex.Search(%s): %v", uri, err)
@@ -167,10 +168,18 @@ func checkFace(logger gogo.Logger, uri, address string) {
 			return
 		}
 
-		alert := models.NewAlertModel(address, uri, bukong.URI, bukong.MonitorClass)
-		if err = alert.Save(); err != nil {
-			logger.Errorf("alert.Save():%v", err)
-			return
+		alert, err := models.Alert.FindByBukongAndDevice(bukong.ID.Hex(), device.ID.Hex())
+		if err == mgo.ErrNotFound {
+			alert = models.NewAlertModel(device.Address, uri, bukong.URI, bukong.MonitorClass, bukong.ID.Hex(), device.ID.Hex())
+			if err = alert.Save(); err != nil {
+				logger.Errorf("alert.Save():%v", err)
+				return
+			}
+		} else {
+			//todo: actually we should clear this img first
+			if time.Now().Unix()-alert.CreatedAt.Unix() < 60*30 {
+				return
+			}
 		}
 
 		//step 2: send alert message
@@ -194,7 +203,7 @@ func (_ *_BuKong) Destroy(ctx *gogo.Context) {
 		ctx.Json(errors.NewErrorResponse(ctx.RequestID(), ctx.RequestURI(), errors.InvalidParameter))
 		return
 	}
-	fmt.Println("--- id : ", id)
+
 	if err := models.BuKong.Delete(id); err != nil {
 		ctx.Logger.Errorf("models.BuKong.Delete(%v): %v", id, err)
 

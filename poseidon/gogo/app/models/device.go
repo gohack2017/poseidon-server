@@ -23,7 +23,7 @@ var (
 )
 
 type DeviceModel struct {
-	ID       bson.ObjectId `bson:"_id" json:"-"`
+	ID       bson.ObjectId `bson:"_id" json:"id"`
 	Num      string        `bson:"num" json:"num"`
 	Password string        `bson:"password" json:"password"`
 	Address  string        `bson:"address" json:"address"`

@@ -77,7 +77,7 @@ func (_ *_BuKong) Find(id string) (res *BukongModel, err error) {
 
 	BuKong.Query(func(c *mgo.Collection) {
 		query := bson.M{
-			"_id": bson.ObjectId(id),
+			"_id": bson.ObjectIdHex(id),
 		}
 
 		err = c.Find(query).One(&res)

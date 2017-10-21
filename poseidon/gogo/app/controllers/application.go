@@ -116,8 +116,9 @@ func (app *Application) Resources() {
 	app.user.Resource("/users", User)
 
 	// app.guest.POST("/upload", BuKong.Upload)
-	app.user.POST("/check", BuKong.Check)
+	app.guest.POST("/check", BuKong.Check)
 
+	app.guest.POST("/existdevice", Device.Exist)
 	app.user.Resource("/device", Device)
 
 	app.user.Resource("/bukong", BuKong)
