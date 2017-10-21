@@ -5,6 +5,7 @@ import (
 
 	"github.com/dolab/gogo"
 	"github.com/dolab/session"
+	"github.com/poseidon/app/concerns/facex"
 	"github.com/poseidon/app/middlewares"
 	"github.com/poseidon/app/models"
 )
@@ -12,6 +13,8 @@ import (
 var (
 	APP    *Application
 	Config *AppConfig
+
+	FaceX *facex.Facex
 )
 
 type Application struct {
@@ -39,6 +42,8 @@ func New(runMode, srcPath string) *Application {
 
 	// setup model
 	models.SetupModelWithConfig(Config.Mongo, appLogger)
+	// init facex
+	FaceX = facex.NewFacex(Config.Facex)
 
 	APP = &Application{
 		AppServer: appServer,

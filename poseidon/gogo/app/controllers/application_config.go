@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/dolab/gogo"
 	"github.com/dolab/session"
+	"github.com/poseidon/app/concerns/facex"
 	"github.com/poseidon/lib/model"
 )
 
@@ -14,6 +15,7 @@ type AppConfig struct {
 	Mongo  *model.Config      `json:"mongo"`
 	Logger *gogo.LoggerConfig `json:"logger"`
 	Cookie *session.Config    `json:"cookie"`
+	Facex  *facex.Config      `json:"facex"`
 }
 
 // NewAppConfig apply application config from *gogo.AppConfig

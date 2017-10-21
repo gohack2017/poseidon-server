@@ -36,9 +36,15 @@
       "domain": "https://example.com",
       "getting_start": {
         "greeting": "Hello, gogo!"
+      },
+      "facex": {
+        "endpoint": "http://argus.atlab.ai",
+        "access_key": "ak",
+        "secret_key": "sk",
+        "group_id": "gohack2017",
+        "timeout": 10
       }
     },
-
     "test": {
       "server": {
         "addr": "localhost",
@@ -58,6 +64,13 @@
       "domain": "https://example.com",
       "getting_start": {
         "greeting": "Hello, gogo!"
+      },
+      "facex": {
+        "endpoint": "http://argus.atlab.ai",
+        "access_key": "ak",
+        "secret_key": "sk",
+        "group_id": "gohack2017",
+        "timeout": 10
       }
     },
 
@@ -76,6 +89,13 @@
         "output": "stdout",
         "level": "warn",
         "filter_params": ["password", "password_confirmation"]
+      },
+      "facex": {
+        "endpoint": "http://argus.atlab.ai",
+        "access_key": "ak",
+        "secret_key": "sk",
+        "group_id": "gohack2017",
+        "timeout": 10
       }
     }
   }
