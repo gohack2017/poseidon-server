@@ -11,15 +11,20 @@ goclean:
 	go clean ./...
 
 goinstall:
-	go get -t -v github.com/poseidon
+	go get -u -v github.com/dolab/gogo
+	go get github.com/dolab/session
+	go get github.com/dolab/httptesting
+	go get -u -v github.com/qiniu/bytes/seekable
 
 goreinstall:
-	go get -t -a -v github.com/poseidon
+	go get -u -v github.com/dolab/gogo
+	go get -t -a -v github.com/dolab/session
+	go get -t -a -v github.com/dolab/httptesting
+	go get -t -a -v github.com/qiniu/bytes/seekable
 
 gotest:
 	go test github.com/poseidon/app/controllers
 	go test github.com/poseidon/app/middlewares
-	# go test github.com/poseidon/app/models
 
 gopackage:
 	mkdir -p bin && go build -a -o bin/poseidon src/github.com/poseidon/main.go
