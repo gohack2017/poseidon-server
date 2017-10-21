@@ -101,6 +101,11 @@ func (app *Application) Resources() {
 	// register your resources
 	// app.GET("/", handler)
 
+	app.guest.POST("/login", User.Login)
+	app.user.DELETE("/logout", User.Logout)
+	app.user.GET("/session", User.Access)
+	app.user.Resource("/users", User)
+
 	app.GET("/@getting_start/hello", GettingStart.Hello)
 }
 

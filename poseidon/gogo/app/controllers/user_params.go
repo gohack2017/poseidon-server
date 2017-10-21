@@ -22,3 +22,8 @@ func NewUserLoginOutput(user *models.UserModel) *UserLoginOutput {
 		Email: user.Email,
 	}
 }
+
+type CreateUserInput struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
