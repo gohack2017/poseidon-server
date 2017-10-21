@@ -1,67 +1,82 @@
 {
-    "name": "poseidon",
-    "mode": "test",
-    "sections": {
-        "development": {
-            "server": {
-                "addr": "localhost",
-                "port": 9090,
-                "ssl": false,
-                "ssl_cert": "/path/to/ssl/cert",
-                "ssl_key": "/path/to/ssl/key",
-                "request_timeout": 30,
-                "response_timeout": 30,
-                "request_id": "X-Request-Id"
-            },
-            "logger": {
-                "output": "stdout",
-                "level": "debug",
-                "filter_params": ["password", "password_confirmation"]
-            },
-            "domain": "https://example.com",
-            "getting_start": {
-                "greeting": "Hello, gogo!"
-            }
-        },
+  "name": "poseidon",
+  "mode": "test",
+  "sections": {
+    "development": {
+      "server": {
+        "addr": "0.0.0.0",
+        "port": 9090,
+        "ssl": false,
+        "ssl_cert": "/path/to/ssl/cert",
+        "ssl_key": "/path/to/ssl/key",
+        "request_timeout": 30,
+        "response_timeout": 30,
+        "request_id": "X-Request-Id"
+      },
+      "mongo": {
+        "host": "localhost:27017",
+        "user": "",
+        "password": "",
+        "database": "poseidon_dev",
+        "mode": "Strong",
+        "pool": 5,
+        "timeout": 5
+      },
+      "logger": {
+        "output": "stdout",
+        "level": "debug",
+        "filter_params": ["password", "password_confirmation"]
+      },
+      "cookie": {
+        "cookie_name": "monitor",
+        "cookie_secure": false,
+        "cookie_expire": 3600,
+        "cookie_secret": "yek terces"
+      },
+      "domain": "https://example.com",
+      "getting_start": {
+        "greeting": "Hello, gogo!"
+      }
+    },
 
-        "test": {
-            "server": {
-                "addr": "localhost",
-                "port": 9090,
-                "ssl": false,
-                "ssl_cert": "/path/to/ssl/cert",
-                "ssl_key": "/path/to/ssl/key",
-                "request_timeout": 30,
-                "response_timeout": 30,
-                "request_id": "X-Request-Id"
-            },
-            "logger": {
-                "output": "stdout",
-                "level": "info",
-                "filter_params": ["password", "password_confirmation"]
-            },
-            "domain": "https://example.com",
-            "getting_start": {
-                "greeting": "Hello, gogo!"
-            }
-        },
+    "test": {
+      "server": {
+        "addr": "localhost",
+        "port": 9090,
+        "ssl": false,
+        "ssl_cert": "/path/to/ssl/cert",
+        "ssl_key": "/path/to/ssl/key",
+        "request_timeout": 30,
+        "response_timeout": 30,
+        "request_id": "X-Request-Id"
+      },
+      "logger": {
+        "output": "stdout",
+        "level": "info",
+        "filter_params": ["password", "password_confirmation"]
+      },
+      "domain": "https://example.com",
+      "getting_start": {
+        "greeting": "Hello, gogo!"
+      }
+    },
 
-        "production": {
-            "server": {
-                "addr": "localhost",
-                "port": 9090,
-                "ssl": true,
-                "ssl_cert": "/path/to/ssl/cert",
-                "ssl_key": "/path/to/ssl/key",
-                "request_timeout": 30,
-                "response_timeout": 30,
-                "request_id": "X-Request-Id"
-            },
-            "logger": {
-                "output": "stdout",
-                "level": "warn",
-                "filter_params": ["password", "password_confirmation"]
-            }
-        }
+    "production": {
+      "server": {
+        "addr": "localhost",
+        "port": 9090,
+        "ssl": true,
+        "ssl_cert": "/path/to/ssl/cert",
+        "ssl_key": "/path/to/ssl/key",
+        "request_timeout": 30,
+        "response_timeout": 30,
+        "request_id": "X-Request-Id"
+      },
+      "logger": {
+        "output": "stdout",
+        "level": "warn",
+        "filter_params": ["password", "password_confirmation"]
+      }
     }
+  }
 }
