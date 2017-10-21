@@ -116,4 +116,6 @@ func (app *Application) Resources() {
 	app.user.Resource("/device", Device)
 
 	app.user.Resource("/bukong", BuKong)
+
+	app.user.Resource("/alert", Alert)
 }
