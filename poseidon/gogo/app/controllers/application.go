@@ -5,9 +5,8 @@ import (
 
 	"github.com/dolab/gogo"
 	"github.com/dolab/session"
-	"github.com/poseidon/app/models"
-
 	"github.com/poseidon/app/middlewares"
+	"github.com/poseidon/app/models"
 )
 
 var (
@@ -107,16 +106,4 @@ func (app *Application) Resources() {
 	app.user.Resource("/users", User)
 
 	app.GET("/@getting_start/hello", GettingStart.Hello)
-}
-
-// Run runs application after registering middelwares and resources
-func (app *Application) Run() {
-	// register middlewares
-	app.Middlewares()
-
-	// register resources
-	app.Resources()
-
-	// run server
-	app.AppServer.Run()
 }

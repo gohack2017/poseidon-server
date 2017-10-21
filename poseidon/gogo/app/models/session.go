@@ -13,7 +13,7 @@ import (
 var (
 	Session *_Session
 
-	sessionCollection = "monotor_session"
+	sessionCollection = "poseidon_session"
 	sessionIndexes    = []mgo.Index{
 		{
 			Key:    []string{"sid"},
