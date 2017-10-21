@@ -14,7 +14,7 @@ var (
 	BuKong *_BuKong
 )
 
-func (_ *_BuKong) Upload(ctx *gogo.Context) {
+func (_ *_BuKong) Check(ctx *gogo.Context) {
 	var input *UploadFileInput
 	if err := ctx.Params.Json(&input); err != nil {
 		ctx.Logger.Errorf("ctx.Params.Json(): %v", err)
@@ -25,7 +25,8 @@ func (_ *_BuKong) Upload(ctx *gogo.Context) {
 
 	data, err := input.FaceImage()
 	kodoclient := kodo.New(Config.Qiniu.Kodo)
-	err = kodoclient.Put(uuid.NewV4().String(), data)
+	key := uuid.NewV4().String()
+	err = kodoclient.Put(key, data)
 	if err != nil {
 		ctx.Logger.Errorf("kodo.client.Put():%v", err)
 
@@ -33,7 +34,25 @@ func (_ *_BuKong) Upload(ctx *gogo.Context) {
 		return
 	}
 
+	uri := "http://" + Config.Qiniu.Kodo.BucketDomain + "/" + key
+	go checkFace(ctx.Logger, uri)
+
 	ctx.Return()
+}
+
+func checkFace(logger gogo.Logger, uri string) {
+	result, err := FaceX.Search(uri)
+	if err != nil {
+		logger.Errorf("Facex.Search(%s): %v", uri, err)
+
+		return
+	}
+
+	if result.IsOK() {
+		//step 1: store record to mongo
+
+		//step 2: send alert message
+	}
 }
 
 // func (_ *_BuKong) Upload(ctx *gogo.Context) {

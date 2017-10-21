@@ -1,0 +1,110 @@
+package models
+
+import (
+	"time"
+
+	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
+)
+
+type _BuKong struct{}
+
+var (
+	BuKong *_BuKong
+
+	bukongCollection = "poseidon_bukong"
+	bukongIndexes    = []mgo.Index{}
+)
+
+type BukongModel struct {
+	ID     bson.ObjectId `bson:"_id"`
+	IDCard string        `bson:"id_card"`
+	Name   string        `bson:"name"`
+	URI    string        `bson:"uri"`
+
+	CreatedAt   time.Time `bson:"created_at"`
+	UpdatedAt   time.Time `bson:"updated_at"`
+	isNewRecord bool      `bson:"-"`
+}
+
+func NewBukongModel(idcard, name, uri string) *BukongModel {
+	return &BukongModel{
+		ID:     bson.NewObjectId(),
+		IDCard: idcard,
+		Name:   name,
+		URI:    uri,
+	}
+}
+
+func (bukong *BukongModel) Save() (err error) {
+	if !bukong.ID.Valid() || bukong.IDCard == "" || bukong.Name == "" {
+		return ErrInvalidArgs
+	}
+
+	BuKong.Query(func(c *mgo.Collection) {
+		t := time.Now()
+		if bukong.IsNewRecord() {
+			bukong.CreatedAt = t
+			bukong.UpdatedAt = t
+		} else {
+			settings := bson.M{
+				"id_card": bukong.IDCard,
+				"name":    bukong.Name,
+				"uri":     bukong.URI,
+			}
+
+			err = c.UpdateId(bukong.ID, bson.M{
+				"$set": settings,
+			})
+		}
+	})
+	return
+}
+
+func (_ *_BuKong) Find(id string) (res *BukongModel, err error) {
+	if !bson.IsObjectIdHex(id) {
+		err = ErrInvalidID
+		return
+	}
+
+	BuKong.Query(func(c *mgo.Collection) {
+		query := bson.M{
+			"_id": bson.ObjectId(id),
+		}
+
+		err = c.Find(query).One(&res)
+	})
+
+	return
+}
+
+func (_ *_BuKong) Delete(id string) (err error) {
+	if !bson.IsObjectIdHex(id) {
+		err = ErrInvalidID
+		return
+	}
+
+	BuKong.Query(func(c *mgo.Collection) {
+		err = c.RemoveId(bson.ObjectId(id))
+	})
+
+	return
+}
+
+func (_ *_BuKong) All(limit int, marker string) (result []*BukongModel, err error) {
+	limit = Helper.ModifyLimit(limit)
+	BuKong.Query(func(c *mgo.Collection) {
+		query := bson.M{}
+		err = c.Find(query).Limit(limit).All(&result)
+	})
+
+	return
+}
+
+func (bukong *BukongModel) IsNewRecord() bool {
+	return bukong.isNewRecord
+}
+
+func (_ *_BuKong) Query(query func(c *mgo.Collection)) {
+	Model().Query(bukongCollection, bukongIndexes, query)
+}
