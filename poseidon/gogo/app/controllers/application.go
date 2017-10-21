@@ -52,6 +52,40 @@ func New(runMode, srcPath string) *Application {
 	return APP
 }
 
+func (app *Application) Session() *session.Session {
+	if app.appSession != nil {
+		return app.appSession
+	}
+
+	app.mux.Lock()
+	defer app.mux.Unlock()
+
+	if app.appSession != nil {
+		return app.appSession
+	}
+
+	app.appSession = session.New(models.Session, Config.Cookie)
+
+	return app.appSession
+}
+
+func (app *Application) V1Use(route string, middlewares ...gogo.Middleware) {
+	switch route {
+	case "*":
+		app.guest.Use(middlewares...)
+		app.user.Use(middlewares...)
+
+	case "guest":
+		app.guest.Use(middlewares...)
+
+	case "user":
+		app.user.Use(middlewares...)
+
+	default:
+		panic("Unknown route of " + route)
+	}
+}
+
 // Middlerwares implements gogo.Middlewarer
 // NOTE: DO NOT change the method name, its required by gogo!
 func (app *Application) Middlewares() {
