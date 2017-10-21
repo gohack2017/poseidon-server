@@ -110,6 +110,7 @@ func (app *Application) Resources() {
 	// app.GET("/", handler)
 
 	app.guest.POST("/login", User.Login)
+	app.user.HEAD("/islogin", User.IsLogin)
 	app.user.DELETE("/logout", User.Logout)
 	app.user.GET("/session", User.Access)
 	app.user.Resource("/users", User)

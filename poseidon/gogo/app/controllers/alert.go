@@ -23,5 +23,9 @@ func (_ *_Alert) Index(ctx *gogo.Context) {
 		ctx.Json(errors.NewErrorResponse(ctx.RequestID(), ctx.RequestURI(), errors.InternalError))
 		return
 	}
+	if alerts == nil {
+		ctx.Json(make([]*models.AlertModel, 0))
+		return
+	}
 	ctx.Json(alerts)
 }

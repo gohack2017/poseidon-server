@@ -17,13 +17,13 @@ var (
 )
 
 type BukongModel struct {
-	ID           bson.ObjectId `bson:"_id"`
-	URI          string        `bson:"uri"`
-	Name         string        `bson:"name"`  //填报人姓名
-	Phone        string        `bson:"phone"` //填报人电话
-	MonitorClass string        `bson:"class"`
-	CreatedAt    time.Time     `bson:"created_at"`
-	UpdatedAt    time.Time     `bson:"updated_at"`
+	ID           bson.ObjectId `bson:"_id" json:"id"`
+	URI          string        `bson:"uri" json:"uri"`
+	Name         string        `bson:"name" json:"name"`   //填报人姓名
+	Phone        string        `bson:"phone" json:"phone"` //填报人电话
+	MonitorClass string        `bson:"class" json:"class"`
+	CreatedAt    time.Time     `bson:"created_at" json:"-"`
+	UpdatedAt    time.Time     `bson:"updated_at" json:"-"`
 	isNewRecord  bool          `bson:"-"`
 }
 
@@ -34,6 +34,8 @@ func NewBukongModel(uri, name, phone, monitorClass string) *BukongModel {
 		Phone:        phone,
 		URI:          uri,
 		MonitorClass: monitorClass,
+
+		isNewRecord: true,
 	}
 }
 
@@ -85,13 +87,13 @@ func (_ *_BuKong) Find(id string) (res *BukongModel, err error) {
 }
 
 func (_ *_BuKong) Delete(id string) (err error) {
-	if !bson.IsObjectIdHex(id) {
-		err = ErrInvalidID
-		return
-	}
+	// if !bson.IsObjectIdHex(id) {
+	// 	err = ErrInvalidID
+	// 	return
+	// }
 
 	BuKong.Query(func(c *mgo.Collection) {
-		err = c.RemoveId(bson.ObjectId(id))
+		err = c.RemoveId(bson.ObjectIdHex(id))
 	})
 
 	return
@@ -101,6 +103,11 @@ func (_ *_BuKong) All(limit int, marker string) (result []*BukongModel, err erro
 	limit = Helper.ModifyLimit(limit)
 	BuKong.Query(func(c *mgo.Collection) {
 		query := bson.M{}
+		if bson.IsObjectIdHex(marker) {
+			query["_id"] = bson.M{
+				"$gte": bson.ObjectIdHex(marker),
+			}
+		}
 		err = c.Find(query).Limit(limit).All(&result)
 	})
 

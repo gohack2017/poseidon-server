@@ -1,6 +1,11 @@
 package controllers
 
 import (
+	"fmt"
+	"io/ioutil"
+	"strings"
+
+	"github.com/poseidon/app/concerns/facex"
 	"github.com/poseidon/app/concerns/kodo"
 	uuid "github.com/satori/go.uuid"
 
@@ -15,17 +20,50 @@ var (
 	BuKong *_BuKong
 )
 
-func (_ *_BuKong) Create(ctx *gogo.Context) {
-	var input *CreateBukongInput
-	if err := ctx.Params.Json(&input); err != nil {
-		ctx.Logger.Errorf("ctx.Params.Json(): %v", err)
+func (_ *_BuKong) ID() string {
+	return "id"
+}
 
-		ctx.Json(errors.NewErrorResponse(ctx.RequestID(), ctx.RequestURI(), errors.MalformedParameter))
+// func (_ *_BuKong) Upload(ctx *gogo.Context) {
+// 	file, _, err := ctx.Request.FormFile("uploadfile")
+// 	if err != nil {
+// 		ctx.Logger.Errorf("ctx.Request.FormFile(uploadfile): %v", err)
+
+// 		ctx.Json(errors.NewErrorResponse(ctx.RequestID(), ctx.RequestURI(), errors.InternalError))
+// 		return
+// 	}
+// 	defer file.Close()
+
+// 	name := uuid.NewV4().String()
+// 	data, err := ioutil.ReadAll(file)
+// 	kodoclient := kodo.New(Config.Qiniu.Kodo)
+// 	err = kodoclient.Put(name, data)
+// 	if err != nil {
+// 		ctx.Logger.Errorf("kodo.client.Put():%v", err)
+
+// 		ctx.Json(errors.NewErrorResponse(ctx.RequestID(), ctx.RequestURI(), errors.InternalError))
+// 		return
+// 	}
+
+// 	ctx.Return()
+// }
+
+func (_ *_BuKong) Create(ctx *gogo.Context) {
+	name := ctx.Request.FormValue("name")
+	phone := ctx.Request.FormValue("phone")
+	monitorClass := ctx.Request.FormValue("class")
+
+	file, _, err := ctx.Request.FormFile("uploadfile")
+	if err != nil {
+		ctx.Logger.Errorf("ctx.Request.FormFile(uploadfile): %v", err)
+
+		ctx.Json(errors.NewErrorResponse(ctx.RequestID(), ctx.RequestURI(), errors.InternalError))
 		return
 	}
+	defer file.Close()
 
 	//send img to kodo bucket
-	data, err := input.FaceImage()
+	data, err := ioutil.ReadAll(file)
 	kodoclient := kodo.New(Config.Qiniu.Kodo)
 	key := uuid.NewV4().String()
 	err = kodoclient.Put(key, data)
@@ -38,7 +76,7 @@ func (_ *_BuKong) Create(ctx *gogo.Context) {
 
 	//store record to mongo
 	uri := "http://" + Config.Qiniu.Kodo.BucketDomain + "/" + key
-	bukong := models.NewBukongModel(uri, input.Name, input.Phone, input.MonitorClass)
+	bukong := models.NewBukongModel(uri, name, phone, monitorClass)
 	if err := bukong.Save(); err != nil {
 		ctx.Logger.Errorf("bukong.Save(): %v", err)
 
@@ -48,13 +86,20 @@ func (_ *_BuKong) Create(ctx *gogo.Context) {
 
 	//create index
 	if err = FaceX.AddFace(uri, bukong.ID.Hex()); err != nil {
-		ctx.Logger.Errorf("Facex.AddFace(%s, %s): %v", uri, bukong.ID.Hex(), err)
+		if strings.Contains(err.Error(), "not found") {
+			err = nil
+			err = FaceX.NewGroup(facex.NewFacexInput(uri, bukong.ID.Hex()))
+		}
 
-		ctx.Json(errors.NewErrorResponse(ctx.RequestID(), ctx.RequestURI(), errors.InternalError))
-		return
+		if err != nil {
+			ctx.Logger.Errorf("Facex.AddFace(%s, %s): %v", uri, bukong.ID.Hex(), err)
+
+			ctx.Json(errors.NewErrorResponse(ctx.RequestID(), ctx.RequestURI(), errors.InternalError))
+			return
+		}
 	}
 
-	ctx.Return()
+	ctx.Redirect("/app/bukong.html")
 }
 
 func (_ *_BuKong) Index(ctx *gogo.Context) {
@@ -129,7 +174,7 @@ func checkFace(logger gogo.Logger, uri, address string) {
 		}
 
 		//step 2: send alert message
-		out, err := SMSClient.Send(bukong.Phone, Config.SmsCfg.renRender("110110"))
+		out, err := SMSClient.Send(bukong.Phone, Config.SmsCfg.Render("110110"))
 		if err != nil {
 			logger.Errorf("SMSClient.Send(): %v", err)
 			return
@@ -141,26 +186,21 @@ func checkFace(logger gogo.Logger, uri, address string) {
 	}
 }
 
-// func (_ *_BuKong) Upload(ctx *gogo.Context) {
-// 	file, _, err := ctx.Request.FormFile("uploadfile")
-// 	if err != nil {
-// 		ctx.Logger.Errorf("ctx.Request.FormFile(uploadfile): %v", err)
+func (_ *_BuKong) Destroy(ctx *gogo.Context) {
+	id := ctx.Params.Get("id")
+	if id == "" {
+		ctx.Logger.Errorf("id is empty")
 
-// 		ctx.Json(errors.NewErrorResponse(ctx.RequestID(), ctx.RequestURI(), errors.InternalError))
-// 		return
-// 	}
-// 	defer file.Close()
+		ctx.Json(errors.NewErrorResponse(ctx.RequestID(), ctx.RequestURI(), errors.InvalidParameter))
+		return
+	}
+	fmt.Println("--- id : ", id)
+	if err := models.BuKong.Delete(id); err != nil {
+		ctx.Logger.Errorf("models.BuKong.Delete(%v): %v", id, err)
 
-// 	name := uuid.NewV4().String()
-// 	data, err := ioutil.ReadAll(file)
-// 	kodoclient := kodo.New(Config.Qiniu.Kodo)
-// 	err = kodoclient.Put(name, data)
-// 	if err != nil {
-// 		ctx.Logger.Errorf("kodo.client.Put():%v", err)
+		ctx.Json(errors.NewErrorResponse(ctx.RequestID(), ctx.RequestURI(), errors.InternalError))
+		return
+	}
 
-// 		ctx.Json(errors.NewErrorResponse(ctx.RequestID(), ctx.RequestURI(), errors.InternalError))
-// 		return
-// 	}
-
-// 	ctx.Return()
-// }
+	ctx.Return()
+}

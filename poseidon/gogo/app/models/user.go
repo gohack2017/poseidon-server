@@ -112,8 +112,10 @@ func (_ *_User) All(limit int, marker string) (result []*UserModel, err error) {
 	limit = Helper.ModifyLimit(limit)
 	User.Query(func(c *mgo.Collection) {
 		query := bson.M{}
-		query["_id"] = bson.M{
-			"$gte": bson.ObjectIdHex(marker),
+		if bson.IsObjectIdHex(marker) {
+			query["_id"] = bson.M{
+				"$gte": bson.ObjectIdHex(marker),
+			}
 		}
 
 		err = c.Find(query).Limit(limit).All(&result)

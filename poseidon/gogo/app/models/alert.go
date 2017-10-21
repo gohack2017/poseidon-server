@@ -71,8 +71,10 @@ func (_ *_Alert) All(limit int, marker string) (result []*AlertModel, err error)
 	limit = Helper.ModifyLimit(limit)
 	Alert.Query(func(c *mgo.Collection) {
 		query := bson.M{}
-		query["_id"] = bson.M{
-			"$gte": bson.ObjectIdHex(marker),
+		if bson.IsObjectIdHex(marker) {
+			query["_id"] = bson.M{
+				"$gte": bson.ObjectIdHex(marker),
+			}
 		}
 
 		err = c.Find(query).Limit(limit).All(&result)

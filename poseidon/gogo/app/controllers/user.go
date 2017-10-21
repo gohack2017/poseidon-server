@@ -35,6 +35,10 @@ func (_ *_User) Create(ctx *gogo.Context) {
 	ctx.Return()
 }
 
+func (_ *_User) IsLogin(ctx *gogo.Context) {
+	ctx.Return()
+}
+
 func (_ *_User) Login(ctx *gogo.Context) {
 	sess := APP.Session()
 

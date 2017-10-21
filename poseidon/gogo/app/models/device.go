@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/poseidon/lib/random"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -13,17 +14,22 @@ var (
 	Device *_Device
 
 	deviceCollection = "poseidon_device"
-	deviceIndexes    = []mgo.Index{}
+	deviceIndexes    = []mgo.Index{
+		{
+			Key:    []string{"num"},
+			Unique: true,
+		},
+	}
 )
 
 type DeviceModel struct {
-	ID       bson.ObjectId `bson:"_id",json:"-"`
-	Num      string        `bson:"num",json:"num"`
-	Password string        `bson:"password",json:"password"`
-	Address  string        `bson:"address",json:"address"`
+	ID       bson.ObjectId `bson:"_id" json:"-"`
+	Num      string        `bson:"num" json:"num"`
+	Password string        `bson:"password" json:"password"`
+	Address  string        `bson:"address" json:"address"`
 
-	CreatedAt time.Time `bson:"created_at",json:"-"`
-	UpdatedAt time.Time `bson:"updated_at",json:"-"`
+	CreatedAt time.Time `bson:"created_at" json:"-"`
+	UpdatedAt time.Time `bson:"updated_at" json:"-"`
 
 	isNewRecord bool `bson:"-"`
 }
@@ -60,8 +66,10 @@ func (_ *_Device) All(limit int, marker string) (result []*DeviceModel, err erro
 	limit = Helper.ModifyLimit(limit)
 	Device.Query(func(c *mgo.Collection) {
 		query := bson.M{}
-		query["_id"] = bson.M{
-			"$gte": bson.ObjectIdHex(marker),
+		if bson.IsObjectIdHex(marker) {
+			query["_id"] = bson.M{
+				"$gte": bson.ObjectIdHex(marker),
+			}
 		}
 
 		err = c.Find(query).Limit(limit).All(&result)
@@ -87,11 +95,25 @@ func (_ *_Device) Find(id string) (device *DeviceModel, err error) {
 	return
 }
 
-// todo add num field
+func (_ *_Device) FindByNum(num string) (device *DeviceModel, err error) {
+	Device.Query(func(c *mgo.Collection) {
+		query := bson.M{
+			"num": num,
+		}
+
+		err = c.Find(query).One(&device)
+	})
+
+	return
+}
+
 func NewDeviceModel(pass, addr string) *DeviceModel {
+	tmp, _ := random.URL.GenerateString(8)
 	return &DeviceModel{
 		ID:          bson.NewObjectId(),
+		Address:     addr,
 		Password:    pass,
+		Num:         tmp,
 		isNewRecord: true,
 	}
 }
