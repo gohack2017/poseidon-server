@@ -17,27 +17,28 @@ var (
 )
 
 type BukongModel struct {
-	ID     bson.ObjectId `bson:"_id"`
-	IDCard string        `bson:"id_card"`
-	Name   string        `bson:"name"`
-	URI    string        `bson:"uri"`
-
-	CreatedAt   time.Time `bson:"created_at"`
-	UpdatedAt   time.Time `bson:"updated_at"`
-	isNewRecord bool      `bson:"-"`
+	ID           bson.ObjectId `bson:"_id"`
+	URI          string        `bson:"uri"`
+	Name         string        `bson:"name"`  //填报人姓名
+	Phone        string        `bson:"phone"` //填报人电话
+	MonitorClass string        `bson:"class"`
+	CreatedAt    time.Time     `bson:"created_at"`
+	UpdatedAt    time.Time     `bson:"updated_at"`
+	isNewRecord  bool          `bson:"-"`
 }
 
-func NewBukongModel(idcard, name, uri string) *BukongModel {
+func NewBukongModel(uri, name, phone, monitorClass string) *BukongModel {
 	return &BukongModel{
-		ID:     bson.NewObjectId(),
-		IDCard: idcard,
-		Name:   name,
-		URI:    uri,
+		ID:           bson.NewObjectId(),
+		Name:         name,
+		Phone:        phone,
+		URI:          uri,
+		MonitorClass: monitorClass,
 	}
 }
 
 func (bukong *BukongModel) Save() (err error) {
-	if !bukong.ID.Valid() || bukong.IDCard == "" || bukong.Name == "" {
+	if !bukong.ID.Valid() || bukong.Name == "" || bukong.Phone == "" {
 		return ErrInvalidArgs
 	}
 
@@ -46,11 +47,16 @@ func (bukong *BukongModel) Save() (err error) {
 		if bukong.IsNewRecord() {
 			bukong.CreatedAt = t
 			bukong.UpdatedAt = t
+
+			if err = c.Insert(bukong); err == nil {
+				bukong.isNewRecord = false
+			}
 		} else {
 			settings := bson.M{
-				"id_card": bukong.IDCard,
-				"name":    bukong.Name,
-				"uri":     bukong.URI,
+				"name":  bukong.Name,
+				"phone": bukong.Phone,
+				"uri":   bukong.URI,
+				"class": bukong.MonitorClass,
 			}
 
 			err = c.UpdateId(bukong.ID, bson.M{
