@@ -169,18 +169,20 @@ func checkFace(logger gogo.Logger, uri string, device *models.DeviceModel) {
 		}
 
 		alert, err := models.Alert.FindByBukongAndDevice(bukong.ID.Hex(), device.ID.Hex())
-		if err == mgo.ErrNotFound {
-			alert = models.NewAlertModel(device.Address, uri, bukong.URI, bukong.MonitorClass, bukong.ID.Hex(), device.ID.Hex())
-			alert.Score = result.Score()
-			if err = alert.Save(); err != nil {
-				logger.Errorf("alert.Save():%v", err)
-				return
-			}
-		} else {
-			//todo: actually we should clear this img first
-			if time.Now().Unix()-alert.CreatedAt.Unix() < 60*30 {
-				return
-			}
+		if err != nil && err != mgo.ErrNotFound {
+			logger.Errorf("models.Alert.FindByBukongAndDevice():%v", err)
+			return
+		}
+
+		if err == nil && time.Now().Unix()-alert.CreatedAt.Unix() < 60*2 {
+			return
+		}
+
+		alert = models.NewAlertModel(device.Address, uri, bukong.URI, bukong.MonitorClass, bukong.ID.Hex(), device.ID.Hex())
+		alert.Score = result.Score()
+		if err = alert.Save(); err != nil {
+			logger.Errorf("alert.Save():%v", err)
+			return
 		}
 
 		//step 2: send alert message
