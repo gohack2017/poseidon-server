@@ -30,9 +30,3 @@ gopackage:
 	mkdir -p bin && go build -a -o bin/poseidon src/github.com/poseidon/main.go
 
 travis: gobuild gotest
-
-
-deploy:
-	GOOS=linux GOARCH=amd64 go build -o bin/poseidon gogo/main.go
-	scp bin/poseidon root@115.231.180.69:/root/poseidon/bin/poseidon2
-	ssh root@115.231.180.69 "supervisorctl stop poseidon && mv /root/poseidon/bin/poseidon2 /root/poseidon/bin/poseidon && supervisorctl start poseidon"
